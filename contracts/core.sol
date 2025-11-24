@@ -39,6 +39,10 @@ contract Core {
     mapping(address => uint) public gem; // available collateral e.g gem[usr] = 100USD [wad]
     mapping(address => uint) public sETH; // [rad]
 
+    constructor() {
+        wards[msg.sender] = 1;
+    }
+
     function either(bool x, bool y) internal pure returns (bool z) {
         assembly {
             z := or(x, y)
