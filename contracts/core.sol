@@ -1,4 +1,6 @@
 // SPDX-License-Identifier: MIT
+/// core.sol -- sETH CDP database
+
 pragma solidity ^0.8.28;
 
 contract Core {
@@ -43,10 +45,27 @@ contract Core {
         wards[msg.sender] = 1;
     }
 
+    // --- Math ---
+    string private constant ARITHMETIC_ERROR =
+        string(abi.encodeWithSignature("Panic(uint256)", 0x11));
+
+    function _add(uint256 x, int256 y) internal pure returns (uint256 z) {
+        unchecked {
+            z = x + uint256(y);
+        }
+        require(y >= 0 || z <= x, ARITHMETIC_ERROR);
+        require(y <= 0 || z >= x, ARITHMETIC_ERROR);
+    }
+
     function either(bool x, bool y) internal pure returns (bool z) {
         assembly {
             z := or(x, y)
         }
+    }
+
+    // Join Collateral
+    function slip(address usr, int256 wad) external auth {
+        gem[usr] = _add(gem[usr], wad);
     }
 
     // Transfer User's Collateral
