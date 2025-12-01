@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-/// core.sol -- sETH CDP database
+/// core.sol -- sBTC CDP database
 
 pragma solidity ^0.8.28;
 
@@ -29,7 +29,7 @@ contract Core {
     }
 
     // --- Data ---
-    uint256 public debts; // Total sETH Issued  [wad]
+    uint256 public debts; // Total sBTC Issued  [wad]
     uint256 public spot; // Price with Safety Margin  [ray]
 
     struct Vault {
@@ -39,7 +39,7 @@ contract Core {
 
     mapping(address => Vault) public vaults;
     mapping(address => uint) public gem; // available collateral e.g gem[usr] = 100USD [wad]
-    mapping(address => uint) public sETH; // [rad]
+    mapping(address => uint) public sBTC; // [rad]
 
     constructor() {
         wards[msg.sender] = 1;
@@ -63,6 +63,12 @@ contract Core {
         }
     }
 
+    // --- Administration ---
+    function file(bytes32 what, uint256 data) external auth {
+        if (what == "spot") spot = data;
+        else revert("Core/file-unrecognized-param");
+    }
+
     // Join Collateral
     function slip(address usr, int256 wad) external auth {
         gem[usr] = _add(gem[usr], wad);
@@ -75,10 +81,10 @@ contract Core {
         gem[dst] = gem[dst] + wad;
     }
 
-    // Transfer User's sETH
+    // Transfer User's sBTC
     function move(address src, address dst, uint256 rad) external {
         require(wish(src, msg.sender), "Core/not-allowed");
-        sETH[src] = sETH[src] - rad;
-        sETH[dst] = sETH[dst] + rad;
+        sBTC[src] = sBTC[src] - rad;
+        sBTC[dst] = sBTC[dst] + rad;
     }
 }

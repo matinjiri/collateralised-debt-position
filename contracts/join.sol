@@ -28,7 +28,7 @@ interface CoreLike {
       - `GemJoin`: For well behaved ERC20 tokens, with simple transfer
                    semantics.
 
-      - `sETHJoin`: For connecting internal sETH balances to an external
+      - `sBTCJoin`: For connecting internal sBTC balances to an external
                     `Token` implementation.
 
     Adapters need to implement two basic methods:
@@ -66,13 +66,13 @@ contract GemJoin {
     }
 }
 
-contract sETHJoin {
+contract sBTCJoin {
     CoreLike public core;   // CDP Engine
-    ERC20Like public sETH;  // Stablecoin Token
+    ERC20Like public sBTC;  // Stablecoin Token
 
-    constructor(address core_, address sETH_) {
+    constructor(address core_, address sBTC_) {
         core = CoreLike(core_);
-        sETH = ERC20Like(sETH_);
+        sBTC = ERC20Like(sBTC_);
     }
 
     uint constant ONE = 10 ** 27;
@@ -83,11 +83,11 @@ contract sETHJoin {
 
     function join(address usr, uint wad) external {
         core.move(address(this), usr, mul(ONE, wad));
-        sETH.burn(msg.sender, wad);
+        sBTC.burn(msg.sender, wad);
     }
 
     function exit(address usr, uint wad) external {
         core.move(msg.sender, address(this), mul(ONE, wad));
-        sETH.mint(usr, wad);
+        sBTC.mint(usr, wad);
     }
 }

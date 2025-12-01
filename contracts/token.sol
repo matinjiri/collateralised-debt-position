@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 
-/// sETH.sol -- sETH Stablecoin ERC-20 Token
+/// sBTC.sol -- sBTC Stablecoin ERC-20 Token
 
 pragma solidity ^0.8.13;
 
-contract SyntheticEthereum {
+contract SyntheticBitcoin {
     // --- Auth ---
     mapping(address => uint) public wards;
     function rely(address guy) external auth {
@@ -14,13 +14,13 @@ contract SyntheticEthereum {
         wards[guy] = 0;
     }
     modifier auth() {
-        require(wards[msg.sender] == 1, "SyntheticEthereum/not-authorized");
+        require(wards[msg.sender] == 1, "SyntheticBitcoin/not-authorized");
         _;
     }
 
     // --- ERC20 Data ---
-    string public constant name = "Synthetic Ethereum";
-    string public constant symbol = "sETH";
+    string public constant name = "Synthetic Bitcoin";
+    string public constant symbol = "sBTC";
     string public constant version = "1";
     uint8 public constant decimals = 18;
     uint256 public totalSupply;
@@ -50,13 +50,13 @@ contract SyntheticEthereum {
         address dst,
         uint wad
     ) public returns (bool) {
-        require(balanceOf[src] >= wad, "SyntheticEthereum/insufficient-balance");
+        require(balanceOf[src] >= wad, "SyntheticBitcoin/insufficient-balance");
         if (
             src != msg.sender && allowance[src][msg.sender] != type(uint256).max
         ) {
             require(
                 allowance[src][msg.sender] >= wad,
-                "SyntheticEthereum/insufficient-allowance"
+                "SyntheticBitcoin/insufficient-allowance"
             );
             allowance[src][msg.sender] = sub(allowance[src][msg.sender], wad);
         }
@@ -71,13 +71,13 @@ contract SyntheticEthereum {
     }
 
     function burn(address usr, uint wad) external {
-        require(balanceOf[usr] >= wad, "SyntheticEthereum/insufficient-balance");
+        require(balanceOf[usr] >= wad, "SyntheticBitcoin/insufficient-balance");
         if (
             usr != msg.sender && allowance[usr][msg.sender] != type(uint256).max
         ) {
             require(
                 allowance[usr][msg.sender] >= wad,
-                "SyntheticEthereum/insufficient-allowance"
+                "SyntheticBitcoin/insufficient-allowance"
             );
             allowance[usr][msg.sender] = sub(allowance[usr][msg.sender], wad);
         }
