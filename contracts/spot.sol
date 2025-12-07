@@ -8,6 +8,23 @@ interface CoreLike {
     function file(bytes32, uint) external;
 }
 
+interface AggregatorV3Interface {
+  function decimals() external view returns (uint8);
+
+  function description() external view returns (string memory);
+
+  function version() external view returns (uint256);
+
+  function getRoundData(
+    uint80 _roundId
+  ) external view returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound);
+
+  function latestRoundData()
+    external
+    view
+    returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound);
+}
+
 contract Oracle {
     // --- Auth ---
     mapping(address => uint) public wards;
@@ -22,6 +39,8 @@ contract Oracle {
         _;
     }
 
+    AggregatorV3Interface public ETHBTCPriceFeed;
+
     // --- Data ---
     uint256 mat; // Liquidation ratio [ray]
 
@@ -29,10 +48,11 @@ contract Oracle {
     uint256 public par; // ref per sBTC [ray]
 
     // --- Init ---
-    constructor(address vat_) {
+    constructor(address vat_, address ETHBTCPriceFeed_) {
         wards[msg.sender] = 1;
         core = CoreLike(vat_);
         par = ONE;
+        ETHBTCPriceFeed = AggregatorV3Interface(ETHBTCPriceFeed_);
     }
 
     // --- Math ---
@@ -51,8 +71,21 @@ contract Oracle {
         else revert("Oracle/file-unrecognized-param");
     }
 
+    function peek() public view returns (bytes32, bool) {
+        (, int256 answer, , , ) = ETHBTCPriceFeed.latestRoundData();
+        uint8 decimals = ETHBTCPriceFeed.decimals();
+
+        require(answer > 0, "Invalid price");
+        uint price = uint(answer) * (10**(18 - decimals));  
+
+        return (bytes32(uint256(price)), true);
+    }
+
     // --- Update value ---
-    function poke(bytes32 ilk) external {
+    function poke() external {
         // todo: get BTC/USD price and file(spot)
+        (bytes32 val, bool has) = peek();
+        uint256 spot = has ? rdiv(rdiv(mul(uint(val), 10 ** 9), par), mat) : 0;
+        core.file("spot", spot);
     }
 }
