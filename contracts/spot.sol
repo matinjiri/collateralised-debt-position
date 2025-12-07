@@ -25,7 +25,7 @@ interface AggregatorV3Interface {
     returns (uint80 roundId, int256 answer, uint256 startedAt, uint256 updatedAt, uint80 answeredInRound);
 }
 
-contract Oracle {
+contract Spot {
     // --- Auth ---
     mapping(address => uint) public wards;
     function rely(address guy) external auth {
