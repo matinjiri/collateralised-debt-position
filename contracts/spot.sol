@@ -83,7 +83,6 @@ contract Oracle {
 
     // --- Update value ---
     function poke() external {
-        // todo: get BTC/USD price and file(spot)
         (bytes32 val, bool has) = peek();
         uint256 spot = has ? rdiv(rdiv(mul(uint(val), 10 ** 9), par), mat) : 0;
         core.file("spot", spot);
