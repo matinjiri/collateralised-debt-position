@@ -40,13 +40,13 @@ interface CoreLike {
 
 contract GemJoin {
     CoreLike public core; // CDP Engine
-    bytes32 public ilk; // Collateral Type
+    bytes32 public market; // Collateral Type
     GemLike public gem;
     uint public dec;
 
-    constructor(address core_, bytes32 ilk_, address gem_) {
+    constructor(address core_, bytes32 market_, address gem_) {
         core = CoreLike(core_);
-        ilk = ilk_;
+        market = market_;
         gem = GemLike(gem_);
     }
 
