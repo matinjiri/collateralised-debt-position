@@ -42,15 +42,15 @@ contract Spotter {
     AggregatorV3Interface public ETHBTCPriceFeed;
 
     // --- Data ---
-    uint256 mat; // Liquidation ratio [ray]
+    uint256 public mat; // Liquidation ratio [ray]
 
     CoreLike public core; // CDP Engine
     uint256 public par; // ref per sBTC [ray]
 
     // --- Init ---
-    constructor(address vat_, address ETHBTCPriceFeed_) {
+    constructor(address core_, address ETHBTCPriceFeed_) {
         wards[msg.sender] = 1;
-        core = CoreLike(vat_);
+        core = CoreLike(core_);
         par = ONE;
         ETHBTCPriceFeed = AggregatorV3Interface(ETHBTCPriceFeed_);
     }

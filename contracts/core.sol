@@ -31,6 +31,7 @@ contract Core {
     // --- Data ---
     uint256 public debts; // Total sBTC Issued  [wad]
     uint256 public spot; // Price with Safety Margin  [ray]
+    uint256 public vice; // Total Unbacked sBTC  [rad]
 
     struct Vault {
         uint256 coll; // Locked Collateral  [wad]
@@ -56,7 +57,23 @@ contract Core {
         require(y >= 0 || z <= x, ARITHMETIC_ERROR);
         require(y <= 0 || z >= x, ARITHMETIC_ERROR);
     }
-
+    function _mul(uint x, int y) internal pure returns (int z) {
+        z = int(x) * y;
+        require(int(x) >= 0);
+        require(y == 0 || z / y == int(x));
+    }
+    function both(bool x, bool y) internal pure returns (bool z) {
+        assembly {
+            z := and(x, y)
+        }
+    }
+    function _sub(uint256 x, int256 y) internal pure returns (uint256 z) {
+        unchecked {
+            z = x - uint256(y);
+        }
+        require(y <= 0 || z <= x, ARITHMETIC_ERROR);
+        require(y >= 0 || z >= x, ARITHMETIC_ERROR);
+    }
     function either(bool x, bool y) internal pure returns (bool z) {
         assembly {
             z := or(x, y)
@@ -86,5 +103,45 @@ contract Core {
         require(wish(src, msg.sender), "Core/not-allowed");
         sBTC[src] = sBTC[src] - rad;
         sBTC[dst] = sBTC[dst] + rad;
+    }
+
+    // --- CDP Manipulation ---
+    function frob(address u, address v, address w, int dcoll, int ddebt) external {
+
+        Vault memory vault = vaults[u];
+
+        require(spot != 0, "Core/market-not-init");
+
+        vault.coll = _add(vault.coll, dcoll);
+        vault.debt = _add(vault.debt, ddebt);
+
+        // vault is either less risky than before, or it is safe
+        require(either(both(ddebt <= 0, dcoll >= 0), vault.debt <= vault.coll * spot), "Core/not-safe");
+
+        // vault is either more safe, or the owner consents
+        require(either(both(dcoll <= 0, ddebt >= 0), wish(u, msg.sender)), "Core/not-allowed-u");
+        // collateral src consents
+        require(either(dcoll <= 0, wish(v, msg.sender)), "Core/not-allowed-v");
+        // debt dst consents
+        require(either(ddebt >= 0, wish(w, msg.sender)), "Core/not-allowed-w");
+
+        gem[v]  = _sub(gem[v], dcoll);
+        sBTC[w] = _add(sBTC[w], ddebt);
+
+        vaults[u] = vault;
+        debts = _add(debts, ddebt);
+
+    }
+
+    // --- CDP Confiscation ---
+    function grab(address u, address v, int dcoll, int ddebt) external auth {
+        Vault storage vault = vaults[u];
+
+        vault.coll = _add(vault.coll, dcoll);
+        vault.debt = _add(vault.debt, ddebt);
+        debts = _add(debts, ddebt);
+
+        gem[v] = _sub(gem[v], dcoll);
+        vice   = _sub(vice, ddebt);
     }
 }
