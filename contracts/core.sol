@@ -50,6 +50,9 @@ contract Core {
     string private constant ARITHMETIC_ERROR =
         string(abi.encodeWithSignature("Panic(uint256)", 0x11));
 
+    uint256 constant WAD = 10 ** 18;
+    uint256 constant RAY = 10 ** 27;
+
     function _add(uint256 x, int256 y) internal pure returns (uint256 z) {
         unchecked {
             z = x + uint256(y);
@@ -116,7 +119,7 @@ contract Core {
         vault.debt = _add(vault.debt, ddebt);
 
         // vault is either less risky than before, or it is safe
-        require(either(both(ddebt <= 0, dcoll >= 0), vault.debt <= vault.coll * spot), "Core/not-safe");
+        require(either(both(ddebt <= 0, dcoll >= 0), vault.debt <= vault.coll * spot / RAY), "Core/not-safe");
 
         // vault is either more safe, or the owner consents
         require(either(both(dcoll <= 0, ddebt >= 0), wish(u, msg.sender)), "Core/not-allowed-u");
@@ -126,7 +129,7 @@ contract Core {
         require(either(ddebt >= 0, wish(w, msg.sender)), "Core/not-allowed-w");
 
         gem[v]  = _sub(gem[v], dcoll);
-        sBTC[w] = _add(sBTC[w], ddebt);
+        sBTC[w] = _add(sBTC[w], _mul(RAY, ddebt));
 
         vaults[u] = vault;
         debts = _add(debts, ddebt);
@@ -142,6 +145,6 @@ contract Core {
         debts = _add(debts, ddebt);
 
         gem[v] = _sub(gem[v], dcoll);
-        vice   = _sub(vice, ddebt);
+        vice   = _sub(vice, _mul(RAY, ddebt));
     }
 }

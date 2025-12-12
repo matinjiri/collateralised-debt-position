@@ -66,7 +66,7 @@ contract GemJoin {
     }
 }
 
-contract sBTCJoin {
+contract SBTCJoin {
     CoreLike public core;   // CDP Engine
     ERC20Like public sBTC;  // Stablecoin Token
 
