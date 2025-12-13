@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes how to deploy the project to **[Stagenet](https://contract.dev/stagenet)**, a private testnet environment that replays Ethereum mainnet state. Stagenet allows teams to import contracts directly from GitHub and provides built‑in developer tools and analytics for debugging, tracing, and monitoring deployments.
+This document describes how to deploy the project to **[Stagenet](https://contract.dev)**, a private testnet environment that replays Ethereum mainnet state. Stagenet allows teams to import contracts directly from GitHub and provides built‑in developer tools and analytics for debugging, tracing, and monitoring deployments.
 
 This guide is intended for developers and reviewers who want a clear, repeatable deployment process without needing local mainnet forking or custom infrastructure.
 
@@ -16,7 +16,7 @@ npm install
 
 ### 3. Compile Contracts
 
-Verify that the project compiles successfully before importing it into [Stagenet](https://contract.dev/stagenet):
+Verify that the project compiles successfully before importing it into [Stagenet](https://contract.dev):
 
 ```bash
 npx hardhat compile
