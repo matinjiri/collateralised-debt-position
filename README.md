@@ -44,4 +44,7 @@ Expected result:
 3. Choose the correct branch (e.g. `main` or `develop`)
 4. Confirm repository access
 
+![GitHub repository selection](imgs/add-repo.png)
 ---
+
+
