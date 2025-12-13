@@ -48,3 +48,12 @@ Expected result:
 ---
 
 
+---
+
+## Detailed Deployment Guide (PDF)
+
+For a step-by-step visual walkthrough of the deployment process, including screenshots and configuration details, refer to the full deployment guide:
+
+📄 **[CDP Deployment Guide (PDF)](https://github.com/matinjiri/collateralised-debt-position/blob/main/CDP%20Deployment.pdf)**
+
+This document complements the instructions above and provides additional clarity on the Stagenet setup and deployment flow.
